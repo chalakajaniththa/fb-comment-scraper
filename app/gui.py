@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, Canvas, Scrollbar
-#from app.facebook_api import get_comments
-#Sfrom app.database import insert_comment
+
 
 class AppGUI:
     def __init__(self, root):
@@ -52,6 +51,9 @@ class AppGUI:
         canvas.bind_all("<Button-4>", on_scroll)
         canvas.bind_all("<Button-5>", on_scroll)
         
+        self.populate_scroll_area()
+
+    def populate_scroll_area(self):
         scrollable_frame = ttk.Frame(canvas)
         canvas.create_window((0, 0), window=scrollable_frame, anchor=tk.NW)
 

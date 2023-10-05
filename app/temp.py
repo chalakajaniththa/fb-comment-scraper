@@ -1,36 +1,32 @@
-import tkinter as tk
-from tkinter import ttk
+import requests
 
-def on_scroll(event):
-    if event.num == 4 or event.delta == 120:
-        canvas.yview_scroll(-1, "units")
-    elif event.num == 5 or event.delta == -120:
-        canvas.yview_scroll(1, "units")
+def get_facebook_comments(post_id, access_token):
+    base_url = "http://graph.facebook.com"
+    endpoint = f"/{post_id}/comments"
+    params = {
+        "access_token": access_token
+    }
 
-def create_scrollable_element():
-    root = tk.Tk()
-    root.title("Simple Scrollable Element")
-    root.geometry("400x300")
+    try:
+        response = requests.get(base_url + endpoint, params=params)
+        if response.status_code == 200:
+            comments_data = response.json()
+            return comments_data.get('data', [])
+        else:
+            print(f"Error: {response.status_code}, {response.json()}")
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred: {e}")
 
-    global canvas
-    canvas = tk.Canvas(root)
-    canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+# Specify the post ID and access token
+post_id = "10152297032458306"  # Replace with the actual post ID
+access_token = "EAAX21kIZAa4wBOZBEJYafPy9q8Rnx6FCgTFRUE5NuGyVgKI1OdzFkKTFnO9Mg7CamFJi8GRMZBaBBBLtEfoJlogTeuGQQKikPtfCZCCa3yqqfXZBanv5otbevyKAPmfBpljnZAGyBZBlViv5WrNa3FxgE7XD5R0nhtalHzanTrRL7GwaD8PZBIJ5Si4mZAK1ZARoM65CSBpZBQKy2ZAZBxm62NYIIIzJvoUdzOXmIc1ZBWqB45ZC1fSQy9BX9NewNIEV9nsNbNSJHSY4K9Ko3cZD"  # Replace with your access token
 
-    # Bind mouse wheel and touchpad scroll events to the canvas
-    canvas.bind_all("<MouseWheel>", on_scroll)
-    canvas.bind_all("<Button-4>", on_scroll)
-    canvas.bind_all("<Button-5>", on_scroll)
+# Get comments for the specified post
+comments = get_facebook_comments(post_id, access_token)
 
-    frame = ttk.Frame(canvas)
-    canvas.create_window((0, 0), window=frame, anchor=tk.NW)
-
-    content_label = ttk.Label(frame, text="This is some example content.\n" * 20)
-    content_label.pack(padx=20, pady=20)
-
-    frame.update_idletasks()
-    canvas.configure(scrollregion=canvas.bbox("all"))
-
-    root.mainloop()
-
-if __name__ == "__main__":
-    create_scrollable_element()
+if comments:
+    # Print the comments
+    for comment in comments:
+        print(comment.get('message'))
+else:
+    print("No comments found.")
